@@ -1,5 +1,4 @@
 /* eslint-disable consistent-return */
-import SimpleSchema from 'simpl-schema';
 import initMethods from './methods.js';
 import initPublications from './server/publications.js';
 
