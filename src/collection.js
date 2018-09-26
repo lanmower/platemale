@@ -48,14 +48,14 @@ const getSchema = (config)=> {
 
    schema[name] = { type,label, required, blackbox }
  }
-  return new SimpleSchema(schema);
+  return schema;
 }
 
 export const initCollections = (config) => {
   const {schema, name, offline} = config
   console.log("COLLECTION: ", name);
   const serverCollection = new Meteor.Collection(name);
-  serverCollection.attachSchema(getSchema(config));
+  //serverCollection.attachSchema(getSchema(config));
   if(Meteor.isClient) {
     if(offline) {
       const clientCollection = new Ground.Collection(name);
