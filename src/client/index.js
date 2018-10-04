@@ -2,7 +2,7 @@ import React from 'react';
 import { render } from 'react-dom';
 import PropTypes from 'prop-types';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
-import {createContainer } from 'meteor/react-meteor-data';
+import {withTracker } from 'meteor/react-meteor-data';
 import NotFound from './NotFound';
 import Typography from '@material-ui/core/Typography';
 //import 'react-select/dist/react-select.css';
@@ -43,11 +43,11 @@ const getUserName = name => ({
   object: `${name.first} ${name.last}`,
 }[typeof name]);
 
-const AppContainer = createContainer(() => {
+const AppContainer = withTracker(() => {
   const { connected } = Meteor.status();
   return {
     connected: connected
   };
-}, AppRouter);
+})(AppRouter);
 
 render(<AppContainer />, document.getElementById('app'));

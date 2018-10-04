@@ -22,9 +22,9 @@ class ViewComponent extends React.Component {
   constructor(props) {
     super(props);
     this.state = {};
-    const {navButtonStore, collections, match, doc, history} = this.props;
+    const {navButtonStore, collections, match, doc, history, config, _id, collection} = this.props;
     navButtonStore.set(<div>
-      <IconButton className="raised" style={{color:"white"}} onClick={() => config.viewHandleRemove(doc._id, history)} aria-label="Delete">
+      <IconButton className="raised" style={{color:"white"}} onClick={() => config.viewHandleRemove(_id, collection, history)} aria-label="Delete">
           <DeleteIcon />
       </IconButton>
       <IconButton className="raised" style={{color:"white"}} onClick={() => history.push(`${match.url}/edit`)} aria-label="Delete">

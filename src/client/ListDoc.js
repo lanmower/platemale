@@ -16,7 +16,7 @@ const render = ({ match, history, info, collection, config, _id }) => {
         </Typography>
         <ListItemText primary={primary} secondary={secondary} />
         <ListItemSecondaryAction>
-          <IconButton onClick={() => config.listHandleRemove(_id, collection)} aria-label="Delete">
+          <IconButton onClick={() => config.listHandleRemove(_id, collection, history)} aria-label="Delete">
             <DeleteIcon />
           </IconButton>
         </ListItemSecondaryAction>

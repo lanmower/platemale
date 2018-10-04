@@ -1,7 +1,11 @@
 const {Meteor} = global;
-const handleRemove = Meteor.isClient?require('./client/handleRemove').default:null;
+import handleRemove from './client/handleRemove';
 const defaults = {
-  offline:false,
+  collectionTypes: {
+    client: true,
+    server: false,
+    submission: false
+  },
   subscribe:true,
   insert:true,
   viewHandleRemove : handleRemove,

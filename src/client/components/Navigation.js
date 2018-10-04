@@ -9,8 +9,7 @@ import AuthenticatedNavigation from './AuthenticatedNavigation';
 import PublicNavigation from './PublicNavigation';
 import OfflineNavigation from './OfflineNavigation';
 import { withRouter } from 'react-router-dom';
-import {createContainer } from 'meteor/react-meteor-data';
-import Roles from 'meteor/alanning:roles';
+import { withTracker } from 'meteor/react-meteor-data';
 import Loading from './Loading';
 
 const AuthenticatedDisplay = (props) => {
@@ -48,7 +47,7 @@ class Navigation extends React.Component {
   }
 }
 
-export default withRouter(createContainer(() => {
+export default withRouter(withTracker(() => {
   const loggingIn = Meteor.loggingIn();
   const userId = Meteor.userId();
   return {
@@ -57,4 +56,4 @@ export default withRouter(createContainer(() => {
     connected: Meteor.status().connected,
     options:menuStore.get()
   };
-}, Navigation));
+})(Navigation));

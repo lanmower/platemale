@@ -1,8 +1,7 @@
-import { createContainer } from 'meteor/react-meteor-data';
+import { withTracker } from 'meteor/react-meteor-data';
 import List from './List';
 import View from './View';
 import Editor from './Editor';
-import handleRemove from './handleRemove';
 import New from './New';
 import NavigationPage from './components/NavigationPage';
 import pluralize from 'pluralize';
@@ -11,24 +10,29 @@ import { menuStore } from './components/Navigation';
 import splitWords from './splitWords.js';
 
 const viewRoute = ({collections, config}) => {
-  const navButtonStore = new ReactiveVar()
-    const collection = config.offline?collections.clientCollection:collections.serverCollection;
-      return {
-          path: "/" + collection._name + "/:_id", component: createContainer(({ match, history }) => {
-              const { subscribe } = config;
-              const { _id } = match.params;
-              const subscription = subscribe?Meteor.subscribe(collection._name + '.view', _id):false;
-              const doc = collection.findOne(_id);
-              const loading = subscribe?(!subscription.ready()):false;
-              const title = capitalize(config.name);
-              const navButtons = navButtonStore.get();
-              return { loading, doc, config, title, navButtons,navButtonStore };
-          }, NavigationPage(View))
-      }
+  const navButtonStore = new ReactiveVar();
+  var collection;
+  if(config.collectionTypes.client) collection = collections.clientCollection;
+  else if(config.collectionTypes.server) collection = collections.serverCollection;
+  return {
+      path: "/" + collection._name + "/:_id", component: withTracker(({ match, history }) => {
+          const { subscribe } = config;
+          const { _id } = match.params;
+          const subscription = subscribe?Meteor.subscribe(collection._name + '.view', _id):false;
+          const doc = collection.findOne(_id);
+          const loading = subscribe?(!subscription.ready()):false;
+          const title = capitalize(config.name);
+          const navButtons = navButtonStore.get();
+          return { loading, doc, config, title, navButtons, collection, collections, navButtonStore, _id };
+      })(NavigationPage(View))
   }
+}
 
-const listRoute = ({collections, config}) => {
-    const collection = config.offline?collections.clientCollection:collections.serverCollection;
+const listRoute = ({collections, config, submissions}) => {
+    var collection;
+    if(submissions) collection = collections.submissionsCollection;
+    else if(config.collectionTypes.client) collection = collections.clientCollection;
+    else if(config.collectionTypes.server) collection = collections.serverCollection;
     const menu = menuStore.get();
     const navButtonStore = new ReactiveVar()
     menu.push(
@@ -38,7 +42,7 @@ const listRoute = ({collections, config}) => {
       }
     );
     return {
-        path: "/" + collection._name, component: createContainer(({ match, history }) => {
+        path: "/" + collection._name, component: withTracker(({ match, history }) => {
             const buttonComp = ()=>(<div>{config.insert?AddButton(history, collection):null}</div>)
             const {subscribe} = config;
             const subscription = subscribe?Meteor.subscribe(collection._name):false;
@@ -50,14 +54,17 @@ const listRoute = ({collections, config}) => {
             console.log(loading);
             if(before) before();
             return {loading, docs, collection, collections, match, history, config, title, navButtons,navButtonStore };
-        }, NavigationPage(List))
+        })(NavigationPage(List))
     }
 }
+
 const submitRoute = ({collections, config}) => {
-    const collection = collections.submissionsCollection;
+    var collection;
+    if(config.collectionTypes.client) collection = collections.clientCollection;
+    else if(config.collectionTypes.server) collection = collections.serverCollection;
     const navButtonStore = new ReactiveVar()
     return {
-        path: "/" + collection._name, component: createContainer(({ match, history }) => {
+        path: "/" + collection._name, component: withTracker(({ match, history }) => {
             const {subscribe} = config;
             const subscription = subscribe?Meteor.subscribe(collection._name):false;
             const docs = collection.find().fetch();
@@ -68,15 +75,19 @@ const submitRoute = ({collections, config}) => {
             if(before) before();
 
             return {loading, docs, collection, match, history, config, title, navButtons, navButtonStore };
-        }, NavigationPage(List))
+        })(NavigationPage(List))
     }
 }
 
 const newRoute = ({collections, config}) => {
-    const collection = config.offline?collections.submissionsCollection:collections.serverCollection;
+  var collection;
+
+  if(config.collectionTypes.client) collection = collections.clientCollection;
+  else if(config.collectionTypes.server) collection = collections.serverCollection;
+
     const navButtonStore = new ReactiveVar();
     return {
-            path: "/"+collection._name+"/new", component: createContainer(({ match }) => {
+            path: "/"+collection._name+"/new", component: withTracker(({ match }) => {
                 const navButtons = navButtonStore.get();
                 const title = "New "+splitWords(capitalize(config.name));
                 const before = config.before.new;
@@ -85,39 +96,43 @@ const newRoute = ({collections, config}) => {
                 return {
                     config, collection, navButtons, navButtonStore, title
                 };
-            }, NavigationPage(New))
+            })(NavigationPage(New))
         }
 }
 
 const editRoute = ({collections, config}) => {
-    const collection = collections.serverCollection;
+  var collection;
+
+  if(config.collectionTypes.client) collection = collections.clientCollection;
+  else if(config.collectionTypes.server) collection = collections.serverCollection;
     const navButtonStore = new ReactiveVar()
-    const title = "Edit "+capitalize(config.name);
+    const {name, before, subscribe}=config;
+    const title = "Edit "+capitalize(name);
     return {
-            path: "/"+collection._name+"/:_id/edit", component: createContainer(({ match }) => {
+            path: "/"+collection._name+"/:_id/edit", component: withTracker(({ match }) => {
                 const { _id } = match.params;
-                const subscription = Meteor.subscribe(collection._name + '.view', _id);
+                const subscription = subscribe?Meteor.subscribe(collection._name + '.view', _id):false;
                 const doc = collection.findOne(_id);
-                const loading = config.subscribe?(!subscription.ready()):false;
+                const loading = subscribe?(!subscription.ready()):false;
                 const navButtons = navButtonStore.get();
-                const title = "New "+splitWords(capitalize(config.name));
-                const before = config.before.edit;
-                if(before) before();
+                const title = "New "+splitWords(capitalize(name));
+                if(before && before.edit) before.edit();
                 return {loading, doc, collection, config, title, navButtons, navButtonStore};
-            }, NavigationPage(Editor))
+            })(NavigationPage(Editor))
         }
 }
 
 const defaultRoutes = (collections)=>{
   const {config} = collections;
-  const {offline} = config;
   const routes = [];
   if(config.defaultRoutes.new)routes['new']=newRoute({collections, config});
   if(config.defaultRoutes.edit)routes['edit']=editRoute({collections, config});
   if(config.defaultRoutes.view)routes['view']=viewRoute({collections, config});
   if(config.defaultRoutes.list)routes['list']=listRoute({collections, config});
-  if(offline) routes['submit']=submitRoute({collections, config});
-
+  if(config.collectionTypes.submit && config.defaultRoutes.new) {
+    routes['submit']=submitRoute({collections, config});
+    routes['submissions']=listRoute({collections, config, submissions:true});
+  }
   return routes;
 
 }

@@ -1,8 +1,7 @@
 /* eslint-disable consistent-return */
 import initMethods from './methods.js';
 import initPublications from './server/publications.js';
-
-
+import SimpleSchema from 'simpl-schema';
 var camelCase = (function () {
     var DEFAULT_REGEX = /[-_]+(.)?/g;
 
@@ -20,7 +19,6 @@ const getSchema = (config)=> {
     owner: {
       type: String,
       label: 'The ID of the user this '+name+' belongs to',
-      required:false,
       autoValue() {
         if (this.isInsert) return Meteor.userId();
       }
@@ -28,7 +26,6 @@ const getSchema = (config)=> {
     createdAt: {
       type: String,
       label: 'The creation date',
-      required:false,
       autoValue() {
         if (this.isInsert) return (new Date()).toISOString();
       },
@@ -36,50 +33,53 @@ const getSchema = (config)=> {
     updatedAt: {
       type: String,
       label: 'The last update date',
-      required:false,
       autoValue() {
         if (this.isInsert || this.isUpdate) return (new Date()).toISOString();
       },
     }
  };
- for(let x in schema) {
-   const {type, label, name, required, blackbox} = schema[x];
-
-   schema[name] = { type,label, required, blackbox }
+ for(let x in config.schema) {
+   schema[config.schema[x].name] = config.schema[x];
  }
   return schema;
 }
 
 export const initCollections = (config) => {
-  const {schema, name, offline} = config
+  const {name, collectionTypes} = config;
+  const {client, submission, server} = collectionTypes;
   console.log("COLLECTION: ", name);
-  const serverCollection = new Meteor.Collection(name);
-  //serverCollection.attachSchema(getSchema(config));
-  if(Meteor.isClient) {
-    if(offline) {
-      const clientCollection = new Ground.Collection(name);
-      const submissionsCollection = new Ground.Collection(name+'-submissions');
-      clientCollection.observeSource(serverCollection.find());
-      clientCollection._name = name;
-      submissionsCollection._name = name;
-      const defaultRoutes = require('./client/crudRoutes.js').default;
-      const module = {clientCollection, serverCollection, submissionsCollection, config};
-      module.routes = defaultRoutes(module);
-      Meteor.modules[name] = module;
-      return module;
-    } else {
-      const defaultRoutes = require('./client/crudRoutes.js').defaultRoutes;
-      const module = {serverCollection, config};
-      module.routes = defaultRoutes(module);
-      Meteor.modules[name] = module;
-      return module;
+  const module = {config};
+  if(Meteor.isServer) {
+    if(server) {
+      module.serverCollection = new Meteor.Collection(name);
+      const schema = getSchema(config);
+      console.log(schema);
+      if(module.serverCollection.attachSchema) module.serverCollection.attachSchema(schema);
+      initMethods(module.serverCollection, config);
+      module.publications = initPublications(module.serverCollection, config);
     }
   }
-  console.log('test');
-  if(Meteor.isServer) {
-    initMethods(serverCollection, config);
-    const publications = initPublications(serverCollection, config);
-    Meteor.modules[name] = {serverCollection, publications};
-    return {serverCollection, publications}
+  if(Meteor.isClient) {
+    module.serverCollection = new Meteor.Collection(name);
+    const schema = getSchema(config);
+    console.log(schema);
+    if(module.serverCollection.attachSchema) module.serverCollection.attachSchema(schema);
+    if(server) {
+      initMethods(module.serverCollection, config);
+    }
+    if(client) {
+      module.clientCollection  = new Ground.Collection(name);
+      if(server) module.clientCollection.observeSource(module.serverCollection.find());
+      module.clientCollection._name = name;
+    }
+    if(submission) {
+      module.submissionsCollection = new Ground.Collection(name+'-submissions');
+      module.submissionsCollection._name = name;
+    }
+    const {defaultRoutes} = require('./client/crudRoutes.js');
+
+    module.routes = defaultRoutes(module);
   }
+  Meteor.modules[name] = module;
+  return module;
  }

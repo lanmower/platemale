@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { createContainer } from "meteor/react-meteor-data";
+import { withTracker } from "meteor/react-meteor-data";
 import {ReactiveVar} from "meteor/reactive-var";
 import OAuthLoginButton from './OAuthLoginButton';
 
@@ -20,7 +20,7 @@ OAuthLoginButtons.propTypes = {
 const verificationComplete = new ReactiveVar(false);
 const verifiedServices = new ReactiveVar([]);
 
-module.exports =  createContainer(({ services }) => {
+module.exports =  withTracker(({ services }) => {
   if (!verificationComplete.get()) {
     Meteor.call('oauth.verifyConfiguration', services, (error, response) => {
       if (error) {
@@ -35,4 +35,4 @@ module.exports =  createContainer(({ services }) => {
   return {
     services: verifiedServices.get(),
   };
-}, OAuthLoginButtons);
+})(OAuthLoginButtons);

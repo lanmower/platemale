@@ -1,4 +1,4 @@
-const handleRemove = (_id, collection) => {
+const handleRemove = (_id, collection, history) => {
   if (confirm('Are you sure? This is permanent!')) {
     collection.remove(_id, (error) => {
       if (error) {
@@ -6,6 +6,7 @@ const handleRemove = (_id, collection) => {
       }
       else {
         Bert.alert('Deleted!', 'success');
+        history.push(`/${collection._name}`);
       }
     });
   }

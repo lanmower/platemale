@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 import Button from '@material-ui/core/Button';
 import { Bert }  from 'meteor/themeteorchef:bert';
-import { createContainer } from 'meteor/react-meteor-data';
+import { withTracker } from 'meteor/react-meteor-data';
 import FormGroup from '@material-ui/core/FormGroup';
 import FormLabel from '@material-ui/core/FormLabel';
 import SaveIcon from '@material-ui/icons/Save';
@@ -197,11 +197,11 @@ Profile.propTypes = {
   user: PropTypes.object.isRequired,
 };
 
-module.exports =  createContainer(() => {
+module.exports =  withTracker(() => {
   const subscription = Meteor.subscribe('users.editProfile');
 
   return {
     loading: !subscription.ready(),
     user: Meteor.user(),
   };
-}, Profile);
+})(Profile);
