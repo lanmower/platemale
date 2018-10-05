@@ -22,7 +22,6 @@ const AppRouter = props => {
     }
   }
   var x = 0;
-  console.log(routes, Meteor.modules);
   return (
     <div>
     <CssBaseline />

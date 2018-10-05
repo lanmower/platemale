@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import NotFound from './components/NotFound';
 import getElement from './modules';
-import Loading from './components/Loading';
 import IconButton from '@material-ui/core/IconButton';
 import { withStyles } from '@material-ui/core/styles';
 import EditIcon from '@material-ui/icons/Edit';
@@ -43,7 +42,7 @@ class ViewComponent extends React.Component {
   return (doc ? (
     <div className="View">
       <Paper elevation={0} className={classes.root}>
-      {loading ? "Loading..." : (<div>
+      <div>
           {
             schema.map((field)=>{
               const value = doc[field.name];
@@ -57,7 +56,6 @@ class ViewComponent extends React.Component {
             })
           }
       </div>
-      )}
       </Paper>
       </div>
 

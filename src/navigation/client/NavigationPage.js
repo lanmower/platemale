@@ -1,8 +1,10 @@
 import React from 'react';
-import Loading from './Loading';
+import Loading from '../../client/components/Loading';
 import Navigation from './Navigation';
 import {withStyles} from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
+
+export const navButtonStore = new ReactiveVar();
 
 let handleSubmit = ()=>{};
 const styles = theme => ({
@@ -18,10 +20,10 @@ module.exports =  (View) => {
     return withStyles(styles)((props)=>{
       const { classes } = props;
       return <div className={props.config?props.config.name:""}>
-              <Navigation {...props} />
+              <Navigation navButtonStore={navButtonStore} {...props} />
               <Paper elevation={0} className={classes.root}>
-            {!props.loading?<View {...props}/>:<Loading/>}
-            </Paper>
-        </div>
+              {!props.loading?<View navButtonStore={navButtonStore} {...props}/>:<Loading/>}
+              </Paper>
+             </div>
   })
 };

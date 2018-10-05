@@ -17,7 +17,6 @@ function handleSubmit() {
   if(config.collectionTypes.submission || config.collectionTypes.client) {
     let id;
     if(existing) {
-      console.log(doc);
       collection.update(doc._id, {$set:submit});
       id = doc._id;
     } else {
@@ -36,7 +35,6 @@ function handleSubmit() {
         const confirmation = existing ? 'Updated!' : 'Added!';
         this.form.reset();
         Bert.alert(confirmation, 'success');
-        console.log(result, "asdf");
         history.push(`/${collectionName}/${result}`);
       }
     });

@@ -25,7 +25,6 @@ class ImageSelect extends React.Component {
     const Option = (props) => {
       const {innerRef, innerProps, data, children} = props;
       const {tabIndex, onClick, onMouseMove, onMouseOver} = innerProps;
-      console.log(props)
       return (
         <div ref={innerRef} tabIndex={tabIndex} onClick={onClick} onMouseMove={onMouseMove} onMouseOver={onMouseOver}><img style={{height:"4em"}} src={'/images/'+path+'/'+data.value+".png"}/></div>
       );
@@ -38,7 +37,6 @@ class ImageSelect extends React.Component {
         );
       }
     }
-    console.log("IMAGESELECT", options);
     return (
 		<Select
 			onInputChange={(inputValue) => this._inputValue = inputValue}

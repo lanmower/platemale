@@ -3,16 +3,26 @@ import initMethods from './methods.js';
 import initPublications from './server/publications.js';
 import SimpleSchema from 'simpl-schema';
 var camelCase = (function () {
-    var DEFAULT_REGEX = /[-_]+(.)?/g;
+  var DEFAULT_REGEX = /[-_]+(.)?/g;
 
-    function toUpper(match, group1) {
-        return group1 ? group1.toUpperCase() : '';
-    }
-    return function (str, delimiters) {
-        return str.replace(delimiters ? new RegExp('[' + delimiters + ']+(.)?', 'g') : DEFAULT_REGEX, toUpper);
-    };
+  function toUpper(match, group1) {
+    return group1 ? group1.toUpperCase() : '';
+  }
+  return function (str, delimiters) {
+    return str.replace(delimiters ? new RegExp('[' + delimiters + ']+(.)?', 'g') : DEFAULT_REGEX, toUpper);
+  };
 })();
 
+function copy(obj, include=[], exclude=[]) {
+
+  return Object.keys(obj).reduce((target, k) => {
+
+    if (exclude.length) {
+      if (exclude.indexOf(k) < 0) target[k] = obj[k];
+    } else if (include.indexOf(k) > -1) target[k] = obj[k];
+    return target;
+  }, {});
+}
 const getSchema = (config)=> {
   const {name} = config
   const schema = {
@@ -37,49 +47,67 @@ const getSchema = (config)=> {
         if (this.isInsert || this.isUpdate) return (new Date()).toISOString();
       },
     }
- };
- for(let x in config.schema) {
-   schema[config.schema[x].name] = config.schema[x];
- }
-  return schema;
-}
+  };
+  for(let x in config.schema) {
+    const copied = copy(config.schema[x], [
+      "type",
+      "label",
+      "optional",
+      "required",
+      "min",
+      "max",
+      "exclusiveMin",
+      "exclusiveMax",
+      "minCount",
+      "maxCount",
+      "allowedValues",
+      "regEx",
+      "blackbox",
+      "trim",
+      "custom",
+      "defaultValue",
+      "autoValue"]);
+    schema[config.schema[x].name] = copied;
+    }
+    return schema;
+  }
 
-export const initCollections = (config) => {
-  const {name, collectionTypes} = config;
-  const {client, submission, server} = collectionTypes;
-  console.log("COLLECTION: ", name);
-  const module = {config};
-  if(Meteor.isServer) {
-    if(server) {
+  export const initCollections = (config) => {
+    const {name, collectionTypes} = config;
+    const {client, submission, server} = collectionTypes;
+    console.log("COLLECTION: ", name);
+    const module = {config};
+    if(Meteor.isServer) {
+      if(server) {
+        module.serverCollection = new Meteor.Collection(name);
+        const schema = getSchema(config);
+        console.log(schema);
+        if(module.serverCollection.attachSchema) module.serverCollection.attachSchema(schema);
+        initMethods(module.serverCollection, config);
+        module.publications = initPublications(module.serverCollection, config);
+      }
+    }
+    if(Meteor.isClient) {
       module.serverCollection = new Meteor.Collection(name);
       const schema = getSchema(config);
       console.log(schema);
       if(module.serverCollection.attachSchema) module.serverCollection.attachSchema(schema);
-      initMethods(module.serverCollection, config);
-      module.publications = initPublications(module.serverCollection, config);
-    }
-  }
-  if(Meteor.isClient) {
-    module.serverCollection = new Meteor.Collection(name);
-    const schema = getSchema(config);
-    console.log(schema);
-    if(module.serverCollection.attachSchema) module.serverCollection.attachSchema(schema);
-    if(server) {
-      initMethods(module.serverCollection, config);
-    }
-    if(client) {
-      module.clientCollection  = new Ground.Collection(name);
-      if(server) module.clientCollection.observeSource(module.serverCollection.find());
-      module.clientCollection._name = name;
-    }
-    if(submission) {
-      module.submissionsCollection = new Ground.Collection(name+'-submissions');
-      module.submissionsCollection._name = name;
-    }
-    const {defaultRoutes} = require('./client/crudRoutes.js');
+      if(server) {
+        initMethods(module.serverCollection, config);
+      }
+      if(client) {
+        module.clientCollection  = new Ground.Collection(name);
+        if(server) module.clientCollection.observeSource(module.serverCollection.find());
+        module.clientCollection._name = name;
+      }
+      if(submission) {
+        module.submissionsCollection = new Ground.Collection(name+'-submissions');
+        module.submissionsCollection._name = name;
+      }
+      const {defaultRoutes} = require('./client/crudRoutes.js');
 
-    module.routes = defaultRoutes(module);
+      module.routes = defaultRoutes(module);
+    }
+    Meteor.modules[name] = module;
+    return module;
   }
-  Meteor.modules[name] = module;
-  return module;
- }

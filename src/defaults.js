@@ -41,5 +41,5 @@ const defaults = {
 
 
 module.exports =  (data) => {
-  return Object.assign(defaults, data);
+  return Object.assign([], defaults,data);
 };

@@ -3,7 +3,6 @@ import React from 'react';
 class Sig extends React.Component {
   constructor(props) {
     super(props);
-    console.log(props);
     this.state = { email: props.state.user.primaryEmail };
   }
 
@@ -12,16 +11,13 @@ class Sig extends React.Component {
       history
     } = this.props;
     this.setState({ "doingSignature": true });
-    console.log(this.state);
     Meteor.call("setSignature", this.state.email, this.state.title, this.state.role, this.state.phone, this.state.email.split("@")[1], (err, res) => {
-      console.log(err, res);
       this.setState({ "doingSignature": false });
     });
   }
 
   render() {
     //const age = Moment(doc.startTime).fromNow();
-    console.log(this.state);
     return (
         <div>
           <form ref={form => (this.form = form)} onSubmit={event => event.preventDefault()}>
@@ -70,7 +66,6 @@ class Sig extends React.Component {
 
 module.exports =  (config)=>{
   const {field, state, props} = config;
-  console.log(config);
 
   return (<Sig field={field} state={state} props={props}/>);
 }

@@ -41,7 +41,7 @@ class ListComponent extends React.Component {
      super(props);
      this.state = {};
      const {navButtonStore, collection, history} = this.props;
-
+     console.log(this.props);
      navButtonStore.set(<Link to={`${collection._name}/new`}><IconButton className="raised" style={{color:"white"}} aria-label="New"><AddIcon /></IconButton></Link>)
    }
 

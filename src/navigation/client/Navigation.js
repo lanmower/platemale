@@ -10,7 +10,7 @@ import PublicNavigation from './PublicNavigation';
 import OfflineNavigation from './OfflineNavigation';
 import { withRouter } from 'react-router-dom';
 import { withTracker } from 'meteor/react-meteor-data';
-import Loading from './Loading';
+import Loading from '../../client/components/Loading';
 
 const AuthenticatedDisplay = (props) => {
   const {authenticated} = props;
@@ -28,7 +28,7 @@ class Navigation extends React.Component {
     loading: PropTypes.bool,
   }
   render() {
-    const { match, location, history, title, authenticated, loading, connected, navButtons } = this.props
+    const { match, location, history, title, authenticated, loading, connected, navButtons, navButtonStore } = this.props
     return (
       <div>
         <div style={{height:"65px"}}></div>
@@ -47,10 +47,15 @@ class Navigation extends React.Component {
   }
 }
 
-export default withRouter(withTracker(() => {
+export default withRouter(withTracker(({navButtonStore}) => {
+
   const loggingIn = Meteor.loggingIn();
   const userId = Meteor.userId();
+  const navButtons = navButtonStore.get();
+
   return {
+    navButtons,
+    navButtonStore,
     loggingIn,
     authenticated: !loggingIn && !!userId,
     connected: Meteor.status().connected,
