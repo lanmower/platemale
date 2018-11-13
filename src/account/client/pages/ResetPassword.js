@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Button from '@material-ui/core/Button';
-import { Bert } from 'meteor/themeteorchef:bert';
+
 
 class ResetPassword extends React.Component {
   constructor(props) {
@@ -44,7 +44,7 @@ class ResetPassword extends React.Component {
 
     Accounts.resetPassword(token, this.newPassword.value, (error) => {
       if (error) {
-        Bert.alert(error.reason, 'danger');
+        window.dialog(error.reason, 'danger');
       } else {
         history.push('/');
       }

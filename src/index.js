@@ -10,8 +10,9 @@ if(Meteor.isServer) {
   });
 }
 else {
-  //exports.modules.navigation = require('./navigation/client/NavigationPage').default;
-  Meteor.modules = exports.modules = require('./client/clientModules').default;
+  const modules = require('./client/clientModules').default;
+  Meteor.modules = exports.modules = modules;
+  exports.NavigationPage = require('./navigation/client/NavigationPage').default;
   Meteor.startup(() => {
     require("./client");
     console.log(Meteor.modules);

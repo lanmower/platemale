@@ -16,7 +16,7 @@ const styles = theme => ({
     marginRight:"auto"
   }
 });
-module.exports =  (View) => {
+export default (View) => {
     return withStyles(styles)((props)=>{
       const { classes } = props;
       return <div className={props.config?props.config.name:""}>

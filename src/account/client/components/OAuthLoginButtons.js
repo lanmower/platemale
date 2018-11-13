@@ -4,18 +4,19 @@ import { withTracker } from "meteor/react-meteor-data";
 import {ReactiveVar} from "meteor/reactive-var";
 import OAuthLoginButton from './OAuthLoginButton';
 
-const OAuthLoginButtons = ({ services, emailMessage }) => (services.length ? (
-  <div className={`OAuthLoginButtons ${emailMessage ? 'WithEmailMessage' : ''}`}>
-    {services.map(service => <OAuthLoginButton key={service} service={service} />)}
-    {emailMessage ? <p className="EmailMessage" style={{ marginLeft: `-${emailMessage.offset}px` }}>
-      {emailMessage.text}
-    </p> : ''}
-  </div>
-) : <div />);
-
-OAuthLoginButtons.propTypes = {
-  services: PropTypes.array.isRequired
+const OAuthLoginButtons = ({ serv, emailMessage }) => {
+  const services = serv?serv:[];
+  console.log(services);
+  return services.length ? (
+    <div className={`OAuthLoginButtons ${emailMessage ? 'WithEmailMessage' : ''}`}>
+      {services.map(service => <OAuthLoginButton key={service} service={service} />)}
+      {emailMessage ? <p className="EmailMessage" style={{ marginLeft: `-${emailMessage.offset}px` }}>
+        {emailMessage.text}
+      </p> : ''}
+    </div>
+  ) : ""
 };
+
 
 const verificationComplete = new ReactiveVar(false);
 const verifiedServices = new ReactiveVar([]);

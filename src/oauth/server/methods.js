@@ -2,7 +2,7 @@ import rateLimit from '../../rate-limit';
 
 Meteor.methods({
   'oauth.verifyConfiguration': function oauthVerifyConfiguration(services) {
-    check(services, Array);
+    if(typeof services != 'array')return;
 
     try {
       const verifiedServices = [];

@@ -9,7 +9,6 @@ function handleSubmit() {
   const {schema} = config;
   const collectionName = collection._name;
   const existing = doc && doc._id;
-  const methodToCall = existing ? collectionName+'.update' : collectionName+'.insert';
   const submit = {};
   schema.map((field)=>{
     submit[field.name] = this.state[field.name];
@@ -24,17 +23,22 @@ function handleSubmit() {
     }
     const confirmation = existing ? 'Updated!' : 'Added!';
     this.form.reset();
-    Bert.alert(confirmation, 'success');
+    window.dialog(confirmation, 'success');
     history.push(`/${collectionName}/${id}`);
   } else if(config.collectionTypes.server) {
+    const methodToCall = existing ? collectionName+'.update' : collectionName+'.insert';
+    for(const field in schema) {
+      submit[schema.name]=doc[schema.name];
+    }
+    if(existing) submit._id = doc._id;
     Meteor.call(methodToCall, submit, (error, result) => {
       if (error) {
-        Bert.alert(error.reason, 'danger');
+        window.dialog(error.reason, 'danger');
       }
       else {
         const confirmation = existing ? 'Updated!' : 'Added!';
         this.form.reset();
-        Bert.alert(confirmation, 'success');
+        window.dialog(confirmation, 'success');
         history.push(`/${collectionName}/${result}`);
       }
     });

@@ -4,9 +4,6 @@ import Button from '@material-ui/core/Button';
 const {
   Link
 } = require( 'react-router-dom');
-const {
-  Bert
-} = require( 'meteor/themeteorchef:bert');
 import OAuthLoginButtons from '../components/OAuthLoginButtons';
 import AccountPageFooter from '../components/AccountPageFooter';
 import FormGroup from '@material-ui/core/FormGroup';
@@ -53,10 +50,10 @@ class Login extends React.Component {
 
     Meteor.loginWithPassword(this.emailAddress.value, this.password.value, (error) => {
       if (error) {
-        Bert.alert(error.reason, 'danger');
+        window.dialog(error.reason, 'danger');
       }
       else {
-        Bert.alert('Welcome back!', 'success');
+        window.dialog('Welcome back!', 'success');
         history.push('/');
       }
     });

@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import Button from '@material-ui/core/Button';
-import { Bert }  from 'meteor/themeteorchef:bert';
+
 import { withTracker } from 'meteor/react-meteor-data';
 import FormGroup from '@material-ui/core/FormGroup';
 import FormLabel from '@material-ui/core/FormLabel';
@@ -92,9 +92,9 @@ class Profile extends React.Component {
 
     Meteor.call('users.editProfile', profile, (error) => {
       if (error) {
-        Bert.alert(error.reason, 'danger');
+        window.dialog(error.reason, 'danger');
       } else {
-        Bert.alert('Profile updated!', 'success');
+        window.dialog('Profile updated!', 'success');
       }
     });
   }

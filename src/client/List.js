@@ -22,15 +22,15 @@ class ListComponent extends React.Component {
 
   handleUpload({submissionsCollection}) {
     return() => {
-       Bert.alert(submissionsCollection._name+'Starting upload...', 'success');
+       window.dialog(submissionsCollection._name+'Starting upload...', 'success');
        const docs = submissionsCollection.find().forEach((doc)=>{
          submissionsCollection.remove(doc._id);
          Meteor.call(submissionsCollection._name+'.insert', doc, (error, _id) => {
            if (error) {
-             Bert.alert(error.reason, 'danger');
+             window.dialog(error.reason, 'danger');
            }
            else {
-             Bert.alert(submissionsCollection._name+' uploaded!', 'success');
+             window.dialog(submissionsCollection._name+' uploaded!', 'success');
            }
          });
        });

@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Button from '@material-ui/core/Button';
 import { Link } from 'react-router-dom';
-import { Bert } from 'meteor/themeteorchef:bert';
+
 import AccountPageFooter from '../components/AccountPageFooter';
 
 class RecoverPassword extends React.Component {
@@ -37,9 +37,9 @@ class RecoverPassword extends React.Component {
 
     Accounts.forgotPassword({ email }, (error) => {
       if (error) {
-        Bert.alert(error.reason, 'danger');
+        window.dialog(error.reason, 'danger');
       } else {
-        Bert.alert(`Check ${email} for a reset link!`, 'success');
+        window.dialog(`Check ${email} for a reset link!`, 'success');
         history.push('/login');
       }
     });

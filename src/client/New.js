@@ -4,7 +4,7 @@ import Editor from "./Editor";
 
 const render = (props) => {
     return (
-        <div className="New">
+        <div className="Edit">
             <Editor {...props}/>
         </div>
     );

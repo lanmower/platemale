@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Button from '@material-ui/core/Button';
 import { Link } from 'react-router-dom';
-import { Bert } from 'meteor/themeteorchef:bert';
+
 import OAuthLoginButtons from '../components/OAuthLoginButtons';
 import AccountPageFooter from '../components/AccountPageFooter';
 import FormGroup from '@material-ui/core/FormGroup';
@@ -68,9 +68,9 @@ class Signup extends React.Component {
       },
     }, (error) => {
       if (error) {
-        Bert.alert(error.reason, 'danger');
+        window.dialog(error.reason, 'danger');
       } else {
-        Bert.alert('Welcome!', 'success');
+        window.dialog('Welcome!', 'success');
         history.push('/');
       }
     });

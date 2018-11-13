@@ -40,12 +40,13 @@ const listRoute = ({collections, config, submissions}) => {
     );
     return {
         path: "/" + collection._name, component: withTracker(({ match, history }) => {
-            const buttonComp = ()=>(<div>{config.insert?AddButton(history, collection):null}</div>)
             const {subscribe} = config;
+            console.log(subscribe);
             const subscription = subscribe?Meteor.subscribe(collection._name):false;
             const docs = collection.find().fetch();
             const loading = subscribe?(!subscription.ready()):false;
             const title = splitWords(capitalize(pluralize(config.name)));
+            console.log(loading);
             const before = config.before.list;
             if(before) before();
             return {loading, docs, collection, collections, match, history, config, title };
@@ -114,14 +115,15 @@ const editRoute = ({collections, config}) => {
 const defaultRoutes = (collections)=>{
   const {config} = collections;
   const routes = [];
-  if(config.defaultRoutes.new)routes['new']=newRoute({collections, config});
-  if(config.defaultRoutes.edit)routes['edit']=editRoute({collections, config});
-  if(config.defaultRoutes.view)routes['view']=viewRoute({collections, config});
-  if(config.defaultRoutes.list)routes['list']=listRoute({collections, config});
+  if(config.defaultRoutes.new)routes.push(newRoute({collections, config}));
+  if(config.defaultRoutes.edit)routes.push(editRoute({collections, config}));
+  if(config.defaultRoutes.view)routes.push(viewRoute({collections, config}));
+  if(config.defaultRoutes.list)routes.push(listRoute({collections, config}));
   if(config.collectionTypes.submit && config.defaultRoutes.new) {
     routes['submit']=submitRoute({collections, config});
     routes['submissions']=listRoute({collections, config, submissions:true});
   }
+  console.log(routes);
   return routes;
 
 }

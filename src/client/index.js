@@ -9,6 +9,7 @@ import Typography from '@material-ui/core/Typography';
 import 'react-virtualized/styles.css';
 import 'react-virtualized-select/styles.css';
 import './clientModules';
+import Dialog from './Dialog';
 import CssBaseline from "@material-ui/core/CssBaseline";
 
 const AppRouter = props => {
@@ -25,6 +26,7 @@ const AppRouter = props => {
   return (
     <div>
     <CssBaseline />
+    <Dialog></Dialog>
     <Router>
       <Switch>
         {routes.map((route) =><Route exact key={x++} path={route.path} component={route.component} {...props} />)}

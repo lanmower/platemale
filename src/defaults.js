@@ -2,8 +2,8 @@ const {Meteor} = global;
 import handleRemove from './client/handleRemove';
 const defaults = {
   collectionTypes: {
-    client: true,
-    server: false,
+    client: false,
+    server: true,
     submission: false
   },
   subscribe:true,
@@ -41,5 +41,5 @@ const defaults = {
 
 
 module.exports =  (data) => {
-  return Object.assign([], defaults,data);
+  return Object.assign({}, defaults,data);
 };

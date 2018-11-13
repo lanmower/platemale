@@ -9,10 +9,8 @@ const init = (collection, config) => {
   }
   if(config.methods.insert) {
     const methods = {};
-    console.log("METHOD:"+collection._name+'.insert');
     methods[collection._name+'.insert'] = (doc)=>{
-      check(doc, verify);
-      return collection.insert({ owner: this.userId, ...doc });
+      return collection.insert({ owner: Meteor.userId(), ...doc });
     };
     Meteor.methods(methods);
   }
@@ -20,10 +18,15 @@ const init = (collection, config) => {
     const methods = {};
     console.log("METHOD: "+collection._name+'.update');
     methods[collection._name+'.update'] = (doc)=>{
-        verify._id = String;
-        check(doc, verify);
+        console.log("CALLED METHOD: "+collection._name+'.update');
         const documentId = doc._id;
-        collection.update(documentId, { $set: doc });
+        if(Meteor.isServer) {
+          const storedDoc = collection.findOne(documentId);
+          console.log(storedDoc, doc);
+          if(!storedDoc) throw new Error("This document does not exist or is not visible to you");
+          if(storedDoc.owner != Meteor.userId()) throw new Error("This document is owned by someone else");
+          collection.update(documentId, { $set: doc });
+        }
         return documentId; // Return _id so we can redirect to document after update.
     }
     Meteor.methods(methods);
@@ -32,7 +35,6 @@ const init = (collection, config) => {
     const methods = {};
     console.log("METHOD: "+collection._name+'.remove');
     methods[collection._name+'.remove'] = (doc)=>{
-      check(documentId, String);
       return collection.remove(documentId);
     }
     Meteor.methods(methods);

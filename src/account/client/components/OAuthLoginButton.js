@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Bert from "meteor/themeteorchef:bert";
+
 import Icon from './Icon';
 
 const handleLogin = (service, callback) => {
@@ -57,7 +57,7 @@ const OAuthLoginButton = ({ service, callback }) => (
 
 OAuthLoginButton.defaultProps = {
   callback: (error) => {
-    if (error) Bert.alert(error.message, 'danger');
+    if (error) window.dialog(error.message, 'danger');
   },
 };
 

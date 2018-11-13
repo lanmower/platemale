@@ -15,9 +15,6 @@ import { withStyles } from '@material-ui/core/styles';
 
 import Radio from '@material-ui/core/Radio';
 import getElement from './modules';
-/*const {
-  Bert
-} = require('meteor/themeteorchef:bert');*/
 
 const styles = theme => ({
   formfield: {

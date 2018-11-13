@@ -12,7 +12,7 @@ const init = (serverCollection, config) => {
   if(config.publish.view) {
     console.log("PUBLICATION:", _name+".view");
     Meteor.publish(_name+'.view', function decksView(_id) {
-      check(_id, String);
+      if(typeof _id != 'string') return;
       const owner = this.userId;
       return serverCollection.find({ _id });
     });
